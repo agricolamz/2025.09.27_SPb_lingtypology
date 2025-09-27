@@ -1,5 +1,5 @@
 ---
-title: "Построение карт с использованием пакета `lingtypology` на R"
+title: "Построение лингвистических карт в R при помощи пакета `lingtypology`"
 date: "today"
 author: "Гарик Мороз"
 date-format: "D.MM.YYYY"
