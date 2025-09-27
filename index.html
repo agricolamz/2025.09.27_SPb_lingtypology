@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.29">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Гарик Мороз">
+
+<title>Построение карт с использованием пакета lingtypology на R</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="index_files/libs/clipboard/clipboard.min.js"></script>
+<script src="index_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="index_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="index_files/libs/quarto-html/popper.min.js"></script>
+<script src="index_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="index_files/libs/quarto-html/anchor.min.js"></script>
+<link href="index_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="index_files/libs/quarto-html/quarto-syntax-highlighting-0815c480559380816a4d1ea211a47e91.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="index_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="index_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="index_files/libs/bootstrap/bootstrap-afe802cb54e224aecf709ed1274ce08a.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="index_files/libs/htmltools-fill-0.5.8.1/fill.css" rel="stylesheet">
+<script src="index_files/libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<script src="index_files/libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<link href="index_files/libs/leaflet-1.3.1/leaflet.css" rel="stylesheet">
+<script src="index_files/libs/leaflet-1.3.1/leaflet.js"></script>
+<link href="index_files/libs/leafletfix-1.0.0/leafletfix.css" rel="stylesheet">
+<script src="index_files/libs/proj4-2.6.2/proj4.min.js"></script>
+<script src="index_files/libs/Proj4Leaflet-1.0.1/proj4leaflet.js"></script>
+<link href="index_files/libs/rstudio_leaflet-1.3.1/rstudio_leaflet.css" rel="stylesheet">
+<script src="index_files/libs/leaflet-binding-2.2.3/leaflet.js"></script>
+<script src="index_files/libs/leaflet-providers-2.0.0/leaflet-providers_2.0.0.js"></script>
+<script src="index_files/libs/leaflet-providers-plugin-2.2.3/leaflet-providers-plugin.js"></script>
+<link href="index_files/libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet">
+<script src="index_files/libs/pagedtable-1.1/js/pagedtable.js"></script>
+
+
+</head>
+
+<body class="quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#введение-в-r-и-rstudio" id="toc-введение-в-r-и-rstudio" class="nav-link active" data-scroll-target="#введение-в-r-и-rstudio"><span class="header-section-number">1</span> Введение в R и RStudio</a>
+  <ul class="collapse">
+  <li><a href="#некоторые-наши-проекты-с-использование-lingtypology" id="toc-некоторые-наши-проекты-с-использование-lingtypology" class="nav-link" data-scroll-target="#некоторые-наши-проекты-с-использование-lingtypology"><span class="header-section-number">1.1</span> Некоторые наши проекты с использование <code>lingtypology</code></a></li>
+  <li><a href="#скачиваем-и-устанавливаем-r.-или-нет" id="toc-скачиваем-и-устанавливаем-r.-или-нет" class="nav-link" data-scroll-target="#скачиваем-и-устанавливаем-r.-или-нет"><span class="header-section-number">1.2</span> Скачиваем и устанавливаем R. Или нет?</a></li>
+  <li><a href="#знакомство-с-rstudio" id="toc-знакомство-с-rstudio" class="nav-link" data-scroll-target="#знакомство-с-rstudio"><span class="header-section-number">1.3</span> Знакомство с RStudio</a></li>
+  <li><a href="#r-как-калькулятор" id="toc-r-как-калькулятор" class="nav-link" data-scroll-target="#r-как-калькулятор"><span class="header-section-number">1.4</span> R как калькулятор</a></li>
+  </ul></li>
+  <li><a href="#разные-типы-объектов-в-r" id="toc-разные-типы-объектов-в-r" class="nav-link" data-scroll-target="#разные-типы-объектов-в-r"><span class="header-section-number">2</span> Разные типы объектов в R</a>
+  <ul class="collapse">
+  <li><a href="#работа-с-пакетами" id="toc-работа-с-пакетами" class="nav-link" data-scroll-target="#работа-с-пакетами"><span class="header-section-number">2.1</span> Работа с пакетами</a></li>
+  <li><a href="#чтение-и-запись-табличных-данных" id="toc-чтение-и-запись-табличных-данных" class="nav-link" data-scroll-target="#чтение-и-запись-табличных-данных"><span class="header-section-number">2.2</span> Чтение и запись табличных данных</a></li>
+  </ul></li>
+  <li><a href="#знакомство-с-lingtypology" id="toc-знакомство-с-lingtypology" class="nav-link" data-scroll-target="#знакомство-с-lingtypology"><span class="header-section-number">3</span> Знакомство с <code>lingtypology</code></a></li>
+  </ul>
+</nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Построение карт с использованием пакета <code>lingtypology</code> на R</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Гарик Мороз </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">27.09.2025</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="введение-в-r-и-rstudio" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="введение-в-r-и-rstudio"><span class="header-section-number">1</span> Введение в R и RStudio</h2>
+<section id="некоторые-наши-проекты-с-использование-lingtypology" class="level3" data-number="1.1">
+<h3 data-number="1.1" class="anchored" data-anchor-id="некоторые-наши-проекты-с-использование-lingtypology"><span class="header-section-number">1.1</span> Некоторые наши проекты с использование <code>lingtypology</code></h3>
+<p>В Международной лаборатории языковой конвергенции есть <a href="http://lingconlab.ru/">страница с ресурсами</a>.</p>
+<ul>
+<li><a href="http://lingconlab.ru/dagatlas/">Typological Atlas of the Languages of Daghestan</a>;</li>
+<li><a href="https://lingconlab.github.io/rutul_dialectology/">Atlas of Rutul dialects</a>;</li>
+<li><a href="https://lingconlab.github.io/PRuD/">Корпус Просодии Русских Диалектов (ПРуД)</a>;</li>
+<li><a href="https://lingconlab.ru/dagloans/">Daghestanian loans database</a>.</li>
+</ul>
+<p>Все приведенные страницы сделаны на <a href="https://quarto.org/"><code>quarto</code></a>/<code>Rmarkdown</code>, а за карты там отвечает пакет <a href="https://ropensci.github.io/lingtypology/"><code>lingtypology</code></a> — надстройка над R-овским пакетом <a href="https://rstudio.github.io/leaflet/"><code>leaflet</code></a>.</p>
+</section>
+<section id="скачиваем-и-устанавливаем-r.-или-нет" class="level3" data-number="1.2">
+<h3 data-number="1.2" class="anchored" data-anchor-id="скачиваем-и-устанавливаем-r.-или-нет"><span class="header-section-number">1.2</span> Скачиваем и устанавливаем R. Или нет?</h3>
+<p>Некоторые люди справедливо не любят устанавливать лишние программы себе на компьютер. Вот несколько вариантов для них:</p>
+<ul>
+<li><a href="https://posit.cloud/">Posit cloud</a> — полная функциональность RStudio с некоторыми неважными для нас ограничениями, нужно залогиниться, например, через google;</li>
+<li><a href="https://webr.r-wasm.org/latest/">webR REPL</a> — ограниченная версия компилятора R, которая работает в вашем браузере и не требует ни установок на компьютер, ни регистрации; <code>lingtypology</code> работает и здесь, но почему-то не отображает подложку карт.</li>
+<li><a href="https://jupyter.org/">Jupyter</a> ноутбуки;</li>
+<li><a href="https://colab.research.google.com">Google Colab</a> (нужно в настройках переключить ядро);</li>
+<li><a href="https://code.visualstudio.com/">VS Code</a> — другое IDE, которое также позволяет работать с R;</li>
+<li>в принципе, в IDE нет нужды, можно работать из терминала, после установки, нужно всего лишь набрать <code>R</code>.</li>
+</ul>
+<p>Если вам понравилось, R можно установить на собственный компьютер:</p>
+<ul>
+<li>R
+<ul>
+<li><a href="https://cran.r-project.org/bin/windows/base/">на Windows</a></li>
+<li><a href="https://cran.r-project.org/bin/macosx/">на Mac</a></li>
+<li><a href="https://cran.rstudio.com/bin/linux/">на Linux</a>, также можно установить из командной строки:</li>
+</ul></li>
+</ul>
+<pre><code>sudo apt-get install r-cran-base</code></pre>
+<ul>
+<li>RStudio — IDE для R (<a href="https://www.rstudio.com/products/rstudio/download/">можно скачать здесь</a>)</li>
+<li>и некоторые пакеты на R</li>
+</ul>
+<p>R, RStudio… как-то все путано… Картинка Стефано Каретты:</p>
+<p><img src="images/03_r_vs_rstudio.png" class="img-fluid"></p>
+</section>
+<section id="знакомство-с-rstudio" class="level3" data-number="1.3">
+<h3 data-number="1.3" class="anchored" data-anchor-id="знакомство-с-rstudio"><span class="header-section-number">1.3</span> Знакомство с RStudio</h3>
+<p><code>RStudio</code> — основной IDE для R. После установки R и RStudio можно открыть RStudio и перед вами появится что-то похожее на изображение ниже:</p>
+<p><img src="images/01_01_rstudio_initial_view.png" class="img-fluid" alt="RStudio при первом открытии"> После нажатия на двойное окошко чуть левее надписи <em>Environment</em> откроется окно скрипта.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/01_02_rstudio_initial_view.png" class="img-fluid figure-img"></p>
+<figcaption>Подокна RStudio</figcaption>
+</figure>
+</div>
+<p>Все следующие команды можно</p>
+<ul>
+<li>вводить в окне консоли, и тогда для исполнения следует нажимать клавишу <code>Enter</code>.</li>
+<li>вводить в окне скрипта, и тогда для исполнения следует нажимать клавиши <code>Ctrl/Cmd + Enter</code> или на команду Run на панели окна скрипта. Все, что введено в окне скрипта можно редактировать как в любом текстовом редакторе, в том числе сохранять <code>Ctrl/Cmd + S</code>.</li>
+</ul>
+<p>Если Вы работаете в &lt;webr.r-wasm.org/&gt;, то в окно консоли код всатвляется при помощи команды <code>Ctrl/Cmd + Shift + V</code>, а в окно скрипта ожидаемо <code>Ctrl/Cmd + V</code>.</p>
+</section>
+<section id="r-как-калькулятор" class="level3" data-number="1.4">
+<h3 data-number="1.4" class="anchored" data-anchor-id="r-как-калькулятор"><span class="header-section-number">1.4</span> R как калькулятор</h3>
+<p>Давайте начнем с самого простого и попробуем использовать R как простой калькулятор. <code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>, <code>^</code> (степень), <code>()</code> и т. д.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="dv">40</span><span class="sc">+</span><span class="dv">2</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 42</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="dv">3-2</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="dv">5</span><span class="sc">*</span><span class="dv">6</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 30</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="dv">99</span><span class="sc">/</span><span class="dv">9</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 11</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span><span class="sc">+</span><span class="dv">4</span><span class="sc">*</span><span class="dv">2</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 10</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>(<span class="dv">2</span><span class="sc">+</span><span class="dv">4</span>)<span class="sc">*</span><span class="dv">2</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 12</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span><span class="sc">^</span><span class="dv">3</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 8</code></pre>
+</div>
+</div>
+<p>Обратите внимание на то, что разделителем целой и дробной частей является точка, кроме того, если целая часть состоит исключительно из 0, то ее можно опустить.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fl">50.3</span> <span class="sc">+</span> .<span class="dv">7</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 51</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="разные-типы-объектов-в-r" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="разные-типы-объектов-в-r"><span class="header-section-number">2</span> Разные типы объектов в R</h2>
+<p>Данные в R обычно причисляют к одному из типов. Сегодня нас будут волновать</p>
+<ul>
+<li>числа</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="dv">42</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 42</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fl">57.57</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 57.57</code></pre>
+</div>
+</div>
+<ul>
+<li>строки</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="st">"Жила-была на свете крыса"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Жила-была на свете крыса"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="st">'В морском порту Вальпараисо,'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "В морском порту Вальпараисо,"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="st">'На складе мяса и маиса,'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "На складе мяса и маиса,"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="st">"Какао и вина."</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Какао и вина."</code></pre>
+</div>
+</div>
+<ul>
+<li>логические</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="cn">TRUE</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] TRUE</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="cn">FALSE</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] FALSE</code></pre>
+</div>
+</div>
+<ul>
+<li>пропущенные значения</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="cn">NA</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] NA</code></pre>
+</div>
+</div>
+<p>Объединения значений одного типа в R называют вектор и соединяют их при помощи функции <code>c()</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="st">"лъа"</span>, <span class="st">"хъу"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "лъа" "хъу"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">3</span>, <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 5 3 2</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="cn">TRUE</span>, <span class="cn">FALSE</span>, <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1]  TRUE FALSE  TRUE</code></pre>
+</div>
+</div>
+<p>В любом векторе могут быть пропущенные значения:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="st">"лъа"</span>, <span class="st">"хъу"</span>, <span class="cn">NA</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "лъа" "хъу" NA   </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="dv">5</span>, <span class="cn">NA</span>, <span class="dv">3</span>, <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1]  5 NA  3  2</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="cn">NA</span>, <span class="cn">TRUE</span>, <span class="cn">FALSE</span>, <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1]    NA  TRUE FALSE  TRUE</code></pre>
+</div>
+</div>
+<p>Табличные данные в R представляют собой наборы векторов и называется датафрейм:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">name =</span> <span class="fu">c</span>(<span class="st">"Соня"</span>, <span class="st">"Лена"</span>),</span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>           <span class="at">hair_length =</span> <span class="fu">c</span>(<span class="dv">50</span>, <span class="dv">15</span>),</span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>           <span class="at">work_in_academia =</span> <span class="fu">c</span>(<span class="cn">TRUE</span>, <span class="cn">FALSE</span>),</span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>           <span class="at">residence =</span> <span class="fu">c</span>(<span class="st">"СПб"</span>, <span class="st">"Москва"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["name"],"name":[1],"type":["chr"],"align":["left"]},{"label":["hair_length"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["work_in_academia"],"name":[3],"type":["lgl"],"align":["right"]},{"label":["residence"],"name":[4],"type":["chr"],"align":["left"]}],"data":[{"1":"Соня","2":"50","3":"TRUE","4":"СПб"},{"1":"Лена","2":"15","3":"FALSE","4":"Москва"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<section id="работа-с-пакетами" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="работа-с-пакетами"><span class="header-section-number">2.1</span> Работа с пакетами</h3>
+<p>Все богатство R находиться в его огромной инфраструктуре пакетов, которые может разрабатывать кто угодно. Для сегодняшнего занятия нам понадобиться всего три: <code>tidyverse</code>, <code>readxl</code>, <code>writexl</code> <code>lingtypology</code>. Чтобы их установить нужно использовать команду</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="fu">c</span>(<span class="st">"tidyverse"</span>, <span class="st">"readxl"</span>, <span class="st">"writexl"</span>, <span class="st">"lingtypology"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Помните, что если вы установили пакет, это не значит, что фукнции пакета вам доступны. Пакет еще нужно включить</p>
+<p><img src="images/02_install.png" class="img-fluid"></p>
+<p>Проверим, что все установилось.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lingtypology)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Based on the Glottolog v. 5.2</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="fu">map.feature</span>(<span class="fu">c</span>(<span class="st">"Nanai"</span>, <span class="st">"Guro"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="leaflet html-widget html-fill-item" id="htmlwidget-244aaddf2639520a3f5a" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-244aaddf2639520a3f5a">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}},"zoomControl":false},"calls":[{"method":"addTiles","args":["OpenStreetMap.Mapnik",null,null,{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false}]},{"method":"addProviderTiles","args":["OpenStreetMap.Mapnik",null,"OpenStreetMap.Mapnik",{"errorTileUrl":"","noWrap":false,"opacity":1,"detectRetina":false}]},{"method":"addCircleMarkers","args":[[48.43426,7.34954],[134.79726,-6.31154],5,null,["",""],{"interactive":true,"className":"","stroke":false,"color":"#03F","weight":1,"opacity":0.5,"fill":true,"fillColor":["#3B8BC6","#3B8BC6"],"fillOpacity":1},null,null,["<a href='https://glottolog.org/resource/languoid/id/nana1257' target='_blank'>Nanai<\/a><br>","<a href='https://glottolog.org/resource/languoid/id/guro1248' target='_blank'>Guro<\/a><br>"],null,null,{"interactive":false,"permanent":false,"direction":"right","opacity":1,"offset":[7.5,0],"textsize":"10px","textOnly":true,"style":{"font-size":"15px","font-family":"sans-serif"},"className":"","sticky":true},null]},{"method":"addScaleBar","args":[{"maxWidth":100,"metric":true,"imperial":true,"updateWhenIdle":true,"position":"bottomleft"}]}],"limits":{"lat":[7.34954,48.43426],"lng":[-6.31154,134.79726]}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</section>
+<section id="чтение-и-запись-табличных-данных" class="level3" data-number="2.2">
+<h3 data-number="2.2" class="anchored" data-anchor-id="чтение-и-запись-табличных-данных"><span class="header-section-number">2.2</span> Чтение и запись табличных данных</h3>
+<p>Для того, чтобы прочитать данные из <code>.csv</code>, <code>.tsv</code> и т. п. нужно использовать функции <code>read_csv()</code> и <code>read_tsv()</code>, где в ковычках путь к файлу или URL.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.1.4     ✔ readr     2.1.5
+✔ forcats   1.0.0     ✔ stringr   1.5.2
+✔ ggplot2   4.0.0     ✔ tibble    3.3.0
+✔ lubridate 1.9.4     ✔ tidyr     1.3.1
+✔ purrr     1.1.0     
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>df1 <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"https://raw.githubusercontent.com/agricolamz/2024.02.03-04_Opling_cartography/main/morning_greetings.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 33 Columns: 6
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr (6): lang, feature, value1, value1_name, value2, value2_name
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>df1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["lang"],"name":[1],"type":["chr"],"align":["left"]},{"label":["feature"],"name":[2],"type":["chr"],"align":["left"]},{"label":["value1"],"name":[3],"type":["chr"],"align":["left"]},{"label":["value1_name"],"name":[4],"type":["chr"],"align":["left"]},{"label":["value2"],"name":[5],"type":["chr"],"align":["left"]},{"label":["value2_name"],"name":[6],"type":["chr"],"align":["left"]}],"data":[{"1":"Lak","2":"Morning greeting","3":"Both","4":"Type of morning greeting","5":"NA","6":"Borrowing source"},{"1":"Northern Akhvakh","2":"Morning greeting","3":"Did you wake up?","4":"Type of morning greeting","5":"NA","6":"Borrowing source"},{"1":"Andi","2":"Morning greeting","3":"Did you wake up?","4":"Type of morning greeting","5":"NA","6":"Borrowing source"},{"1":"Archi","2":"Morning greeting","3":"Did you wake up?","4":"Type of morning greeting","5":"NA","6":"Borrowing source"},{"1":"Avar","2":"Morning greeting","3":"Did you wake up?","4":"Type of morning greeting","5":"Avar","6":"Borrowing source"},{"1":"Bagvalal","2":"Morning greeting","3":"Did you wake up?","4":"Type of morning greeting","5":"NA","6":"Borrowing source"},{"1":"Bezhta","2":"Morning greeting","3":"Did you wake up?","4":"Type of morning greeting","5":"NA","6":"Borrowing source"},{"1":"Botlikh","2":"Morning greeting","3":"Did you wake up?","4":"Type of morning greeting","5":"NA","6":"Borrowing source"},{"1":"Chamalal","2":"Morning greeting","3":"Did you wake up?","4":"Type of morning greeting","5":"NA","6":"Borrowing source"},{"1":"Nuclear North Dargwa","2":"Morning greeting","3":"Did you wake up?","4":"Type of morning greeting","5":"NA","6":"Borrowing source"},{"1":"Godoberi","2":"Morning greeting","3":"Did you wake up?","4":"Type of morning greeting","5":"NA","6":"Borrowing source"},{"1":"Hinuq","2":"Morning greeting","3":"Did you wake up?","4":"Type of morning greeting","5":"NA","6":"Borrowing source"},{"1":"Karata","2":"Morning greeting","3":"Did you wake up?","4":"Type of morning greeting","5":"NA","6":"Borrowing source"},{"1":"Xvarshi","2":"Morning greeting","3":"Did you wake up?","4":"Type of morning greeting","5":"NA","6":"Borrowing source"},{"1":"Tindi","2":"Morning greeting","3":"Did you wake up?","4":"Type of morning greeting","5":"NA","6":"Borrowing source"},{"1":"Tsez","2":"Morning greeting","3":"Did you wake up?","4":"Type of morning greeting","5":"NA","6":"Borrowing source"},{"1":"Aghul","2":"Morning greeting","3":"Good morning","4":"Type of morning greeting","5":"Azerbaijani","6":"Borrowing source"},{"1":"Eastern Armenian","2":"Morning greeting","3":"Good morning","4":"Type of morning greeting","5":"NA","6":"Borrowing source"},{"1":"North Azerbaijani","2":"Morning greeting","3":"Good morning","4":"Type of morning greeting","5":"Azerbaijani","6":"Borrowing source"},{"1":"Budukh","2":"Morning greeting","3":"Good morning","4":"Type of morning greeting","5":"NA","6":"Borrowing source"},{"1":"Chechen","2":"Morning greeting","3":"Good morning","4":"Type of morning greeting","5":"NA","6":"Borrowing source"},{"1":"Georgian","2":"Morning greeting","3":"Good morning","4":"Type of morning greeting","5":"NA","6":"Borrowing source"},{"1":"Ingush","2":"Morning greeting","3":"Good morning","4":"Type of morning greeting","5":"NA","6":"Borrowing source"},{"1":"Khinalug","2":"Morning greeting","3":"Good morning","4":"Type of morning greeting","5":"Azerbaijani","6":"Borrowing source"},{"1":"Kumyk","2":"Morning greeting","3":"Good morning","4":"Type of morning greeting","5":"NA","6":"Borrowing source"},{"1":"Lezgian","2":"Morning greeting","3":"Good morning","4":"Type of morning greeting","5":"NA","6":"Borrowing source"},{"1":"Nogai","2":"Morning greeting","3":"Good morning","4":"Type of morning greeting","5":"NA","6":"Borrowing source"},{"1":"Rutul","2":"Morning greeting","3":"Good morning","4":"Type of morning greeting","5":"Azerbaijani","6":"Borrowing source"},{"1":"Tabasaran","2":"Morning greeting","3":"Good morning","4":"Type of morning greeting","5":"Azerbaijani","6":"Borrowing source"},{"1":"Northern Muslim Tat","2":"Morning greeting","3":"Good morning","4":"Type of morning greeting","5":"Azerbaijani","6":"Borrowing source"},{"1":"Tsakhur","2":"Morning greeting","3":"Good morning","4":"Type of morning greeting","5":"NA","6":"Borrowing source"},{"1":"Udi","2":"Morning greeting","3":"Good morning","4":"Type of morning greeting","5":"Azerbaijani","6":"Borrowing source"},{"1":"Bats","2":"Morning greeting","3":"No special greeting","4":"Type of morning greeting","5":"NA","6":"Borrowing source"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<p>Можно также работать с файлами эксель (если Вы <a href="https://www.nature.com/articles/d41586-021-02211-4">не боитесь</a>), но для этого их надо скачивать локально на компьютер. Попробуйте считать <a href="https://github.com/agricolamz/2024.02.03-04_Opling_cartography/raw/main/morning_greetings.xlsx">вот такой файл</a>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readxl)</span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a>df2 <span class="ot">&lt;-</span> <span class="fu">read_xlsx</span>(<span class="st">"morning_greetings.xlsx"</span>)</span>
+<span id="cb58-4"><a href="#cb58-4" aria-hidden="true" tabindex="-1"></a>df2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["lang"],"name":[1],"type":["chr"],"align":["left"]},{"label":["feature"],"name":[2],"type":["chr"],"align":["left"]},{"label":["value1"],"name":[3],"type":["chr"],"align":["left"]},{"label":["value1_name"],"name":[4],"type":["chr"],"align":["left"]},{"label":["value2"],"name":[5],"type":["chr"],"align":["left"]},{"label":["value2_name"],"name":[6],"type":["chr"],"align":["left"]}],"data":[{"1":"Lak","2":"Morning greeting","3":"Both","4":"Type of morning greeting","5":"NA","6":"Borrowing source"},{"1":"Northern Akhvakh","2":"Morning greeting","3":"Did you wake up?","4":"Type of morning greeting","5":"NA","6":"Borrowing source"},{"1":"Andi","2":"Morning greeting","3":"Did you wake up?","4":"Type of morning greeting","5":"NA","6":"Borrowing source"},{"1":"Archi","2":"Morning greeting","3":"Did you wake up?","4":"Type of morning greeting","5":"NA","6":"Borrowing source"},{"1":"Avar","2":"Morning greeting","3":"Did you wake up?","4":"Type of morning greeting","5":"Avar","6":"Borrowing source"},{"1":"Bagvalal","2":"Morning greeting","3":"Did you wake up?","4":"Type of morning greeting","5":"NA","6":"Borrowing source"},{"1":"Bezhta","2":"Morning greeting","3":"Did you wake up?","4":"Type of morning greeting","5":"NA","6":"Borrowing source"},{"1":"Botlikh","2":"Morning greeting","3":"Did you wake up?","4":"Type of morning greeting","5":"NA","6":"Borrowing source"},{"1":"Chamalal","2":"Morning greeting","3":"Did you wake up?","4":"Type of morning greeting","5":"NA","6":"Borrowing source"},{"1":"Nuclear North Dargwa","2":"Morning greeting","3":"Did you wake up?","4":"Type of morning greeting","5":"NA","6":"Borrowing source"},{"1":"Godoberi","2":"Morning greeting","3":"Did you wake up?","4":"Type of morning greeting","5":"NA","6":"Borrowing source"},{"1":"Hinuq","2":"Morning greeting","3":"Did you wake up?","4":"Type of morning greeting","5":"NA","6":"Borrowing source"},{"1":"Karata","2":"Morning greeting","3":"Did you wake up?","4":"Type of morning greeting","5":"NA","6":"Borrowing source"},{"1":"Xvarshi","2":"Morning greeting","3":"Did you wake up?","4":"Type of morning greeting","5":"NA","6":"Borrowing source"},{"1":"Tindi","2":"Morning greeting","3":"Did you wake up?","4":"Type of morning greeting","5":"NA","6":"Borrowing source"},{"1":"Tsez","2":"Morning greeting","3":"Did you wake up?","4":"Type of morning greeting","5":"NA","6":"Borrowing source"},{"1":"Aghul","2":"Morning greeting","3":"Good morning","4":"Type of morning greeting","5":"Azerbaijani","6":"Borrowing source"},{"1":"Eastern Armenian","2":"Morning greeting","3":"Good morning","4":"Type of morning greeting","5":"NA","6":"Borrowing source"},{"1":"North Azerbaijani","2":"Morning greeting","3":"Good morning","4":"Type of morning greeting","5":"Azerbaijani","6":"Borrowing source"},{"1":"Budukh","2":"Morning greeting","3":"Good morning","4":"Type of morning greeting","5":"NA","6":"Borrowing source"},{"1":"Chechen","2":"Morning greeting","3":"Good morning","4":"Type of morning greeting","5":"NA","6":"Borrowing source"},{"1":"Georgian","2":"Morning greeting","3":"Good morning","4":"Type of morning greeting","5":"NA","6":"Borrowing source"},{"1":"Ingush","2":"Morning greeting","3":"Good morning","4":"Type of morning greeting","5":"NA","6":"Borrowing source"},{"1":"Khinalug","2":"Morning greeting","3":"Good morning","4":"Type of morning greeting","5":"Azerbaijani","6":"Borrowing source"},{"1":"Kumyk","2":"Morning greeting","3":"Good morning","4":"Type of morning greeting","5":"NA","6":"Borrowing source"},{"1":"Lezgian","2":"Morning greeting","3":"Good morning","4":"Type of morning greeting","5":"NA","6":"Borrowing source"},{"1":"Nogai","2":"Morning greeting","3":"Good morning","4":"Type of morning greeting","5":"NA","6":"Borrowing source"},{"1":"Rutul","2":"Morning greeting","3":"Good morning","4":"Type of morning greeting","5":"Azerbaijani","6":"Borrowing source"},{"1":"Tabasaran","2":"Morning greeting","3":"Good morning","4":"Type of morning greeting","5":"Azerbaijani","6":"Borrowing source"},{"1":"Northern Muslim Tat","2":"Morning greeting","3":"Good morning","4":"Type of morning greeting","5":"Azerbaijani","6":"Borrowing source"},{"1":"Tsakhur","2":"Morning greeting","3":"Good morning","4":"Type of morning greeting","5":"NA","6":"Borrowing source"},{"1":"Udi","2":"Morning greeting","3":"Good morning","4":"Type of morning greeting","5":"Azerbaijani","6":"Borrowing source"},{"1":"Bats","2":"Morning greeting","3":"No special greeting","4":"Type of morning greeting","5":"NA","6":"Borrowing source"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<p>Запись таблицы происходит при помощи команд <code>write_csv()</code>, <code>write_tsv()</code> и других. Кроме того есть пакет <code>writexl</code> с функцией <code>write_xlsx()</code>.</p>
+<p>Ссылки на датасеты, если у вас нет своих:</p>
+<ul>
+<li><a href="https://raw.githubusercontent.com/agricolamz/2024.02.03-04_Opling_cartography/main/morning_greetings.csv">morning greetings</a> (основан на Naccarato, C. and S. Verhees (2021). “Morning greetings”. In: Typological Atlas of the Languages of Daghestan (TALD). Ed. by M. Daniel, K. Filatov, T. Maisak, G. Moroz, T. Mukhin, C. Naccarato and S. Verhees. Moscow: Linguistic Convergence Laboratory, NRU HSE. DOI: 10.5281/zenodo.6807070. http://lingconlab.ru/dagatlas.)</li>
+<li><a href="https://raw.githubusercontent.com/agricolamz/2024.02.03-04_Opling_cartography/main/rutul_lexical_item_for_cowhouse.csv">рутульская корова</a> (основан на моих данных из A. Alekseeva, N. Beklemishev, M. Daniel, N. Dobrushina, K. Filatov, A. Ivanova, T. Maisak, M. Melenchenko, G. Moroz, I. Netkachev, I. Sadakov. Atlas of Rutul dialects. Moscow: Linguistic Convergence Laboratory, HSE University. https://lingconlab.github.io/rutul_dialectology/index.html)</li>
+</ul>
+</section>
+</section>
+<section id="знакомство-с-lingtypology" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="знакомство-с-lingtypology"><span class="header-section-number">3</span> Знакомство с <code>lingtypology</code></h2>
+<p>проще продолжить на <a href="https://ropensci.github.io/lingtypology/">сайте-документации</a>.</p>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
