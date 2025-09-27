@@ -174,11 +174,11 @@ map.feature(c("Nanai", "Guro"))
 
 ```{r}
 library(tidyverse)
-df1 <- read_csv("https://raw.githubusercontent.com/agricolamz/2024.02.03-04_Opling_cartography/main/morning_greetings.csv")
+df1 <- read_csv("https://raw.githubusercontent.com/agricolamz/2025.09.27_SPb_lingtypology/main/morning_greetings.csv")
 df1
 ```
 
-Можно также работать с файлами эксель (если Вы [не боитесь](https://www.nature.com/articles/d41586-021-02211-4)), но для этого их надо скачивать локально на компьютер. Попробуйте считать [вот такой файл](https://github.com/agricolamz/2024.02.03-04_Opling_cartography/raw/main/morning_greetings.xlsx).
+Можно также работать с файлами эксель (если Вы [не боитесь](https://www.nature.com/articles/d41586-021-02211-4)), но для этого их надо скачивать локально на компьютер. Попробуйте считать [вот такой файл](https://github.com/agricolamz/2025.09.27_SPb_lingtypology/raw/main/morning_greetings.xlsx).
 
 ```{r}
 library(readxl)
@@ -191,8 +191,8 @@ df2
 
 Ссылки на датасеты, если у вас нет своих:
 
-- [morning greetings](https://raw.githubusercontent.com/agricolamz/2024.02.03-04_Opling_cartography/main/morning_greetings.csv) (основан на Naccarato, C. and S. Verhees (2021). “Morning greetings”. In: Typological Atlas of the Languages of Daghestan (TALD). Ed. by M. Daniel, K. Filatov, T. Maisak, G. Moroz, T. Mukhin, C. Naccarato and S. Verhees. Moscow: Linguistic Convergence Laboratory, NRU HSE. DOI: 10.5281/zenodo.6807070. http://lingconlab.ru/dagatlas.)
-- [рутульская корова](https://raw.githubusercontent.com/agricolamz/2024.02.03-04_Opling_cartography/main/rutul_lexical_item_for_cowhouse.csv) (основан на моих данных из A. Alekseeva, N. Beklemishev, M. Daniel, N. Dobrushina, K. Filatov, A. Ivanova, T. Maisak, M. Melenchenko, G. Moroz, I. Netkachev, I. Sadakov. Atlas of Rutul dialects. Moscow: Linguistic Convergence Laboratory, HSE University. https://lingconlab.github.io/rutul_dialectology/index.html)
+- [morning greetings](https://raw.githubusercontent.com/agricolamz/2025.09.27_SPb_lingtypology/main/morning_greetings.csv) (основан на Naccarato, C. and S. Verhees (2021). “Morning greetings”. In: Typological Atlas of the Languages of Daghestan (TALD). Ed. by M. Daniel, K. Filatov, T. Maisak, G. Moroz, T. Mukhin, C. Naccarato and S. Verhees. Moscow: Linguistic Convergence Laboratory, NRU HSE. DOI: 10.5281/zenodo.6807070. http://lingconlab.ru/dagatlas.)
+- [рутульская корова](https://raw.githubusercontent.com/agricolamz/2025.09.27_SPb_lingtypology/main/rutul_lexical_item_for_cowhouse.csv) (основан на моих данных из A. Alekseeva, N. Beklemishev, M. Daniel, N. Dobrushina, K. Filatov, A. Ivanova, T. Maisak, M. Melenchenko, G. Moroz, I. Netkachev, I. Sadakov. Atlas of Rutul dialects. Moscow: Linguistic Convergence Laboratory, HSE University. https://lingconlab.github.io/rutul_dialectology/index.html)
 
 ## Знакомство с `lingtypology`
 
